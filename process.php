@@ -1,13 +1,12 @@
 <?php
 include 'db.php';
-session_start();
 
-$message = "";
+session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['login'])) {
         // Manejo del inicio de sesión
-        $usuario = $conn->real_escape_string($_POST['usuario']);
+        $usuario = $_POST['usuario'];
         $password = $_POST['password'];
 
         $sql = "SELECT id, password FROM estudiantes WHERE usuario = '$usuario'";
@@ -29,9 +28,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (isset($_SESSION['usuario'])) {
         if (isset($_POST['register'])) {
             // Registro de estudiantes
-            $nombre = $conn->real_escape_string($_POST['nombre']);
-            $numero_control = $conn->real_escape_string($_POST['numero_control']);
-            $usuario = $conn->real_escape_string($_POST['usuario']);
+            $nombre = $_POST['nombre'];
+            $numero_control = $_POST['numero_control'];
+            $usuario = $_POST['usuario'];
             $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Encriptar contraseña
 
             $sql = "INSERT INTO estudiantes (nombre, numero_control, usuario, password) VALUES ('$nombre', '$numero_control', '$usuario', '$password')";
@@ -43,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         } elseif (isset($_POST['search'])) {
             // Búsqueda de estudiantes
-            $numero_control = $conn->real_escape_string($_POST['numero_control_search']);
+            $numero_control = $_POST['numero_control_search'];
 
             $sql = "SELECT * FROM estudiantes WHERE numero_control = '$numero_control'";
             $result = $conn->query($sql);
@@ -58,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     } else {
-        header("Location: index.html");
+        header("Location: index.php");
         exit;
     }
 }
@@ -72,16 +71,15 @@ $conn->close();
     <title>Resultado de Procesamiento</title>
 </head>
 <body>
-    <?php if (!empty($message)): ?>
+    <?php if (isset($message)): ?>
         <p><?php echo $message; ?></p>
     <?php endif; ?>
 
-    <?php if (!empty($search_results)): ?>
+    <?php if (isset($search_results)): ?>
         <p><?php echo $search_results; ?></p>
     <?php endif; ?>
 
     <?php if (isset($_SESSION['usuario'])): ?>
-        <h1>Hola <?php echo $usuario; ?></h1>
         <h2>Formulario de Registro</h2>
         <form method="post" action="process.php">
             Nombre: <input type="text" name="nombre" required><br>
@@ -97,7 +95,7 @@ $conn->close();
             <input type="submit" name="search" value="Buscar">
         </form>
     <?php else: ?>
-        <a href="index.html">Volver al inicio</a>
+        <a href="index.php">Volver al inicio</a>
     <?php endif; ?>
 </body>
 </html>
