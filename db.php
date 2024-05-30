@@ -1,5 +1,5 @@
 <?php
-$servername = "bd-pf.privatelink.mysql.database.azure.com";
+$servername = "dbpf2.privatelink.mysql.database.azure.com";
 $username = "sam";
 $password = "Bleach150!!!";
 $dbname = "estudianteDB";
