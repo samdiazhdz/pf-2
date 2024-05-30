@@ -18,10 +18,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
         // Si se encontró un usuario, verificar la contraseña
         $row = $result->fetch_assoc();
         if (password_verify($password, $row['password'])) {
-            // Iniciar sesión y redirigir al usuario al formulario de registro y consulta
+            // Iniciar sesión y redirigir al usuario a process.php
             $_SESSION['usuario'] = $usuario;
             $_SESSION['user_id'] = $row['id'];
-            header("Location: index.php");
+            header("Location: process.php");
             exit;
         } else {
             // Si la contraseña es incorrecta, mostrar un mensaje de error
@@ -33,9 +33,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     }
 }
 
-// Si el usuario ya ha iniciado sesión, redirigirlo al formulario de registro y consulta
+// Si el usuario ya ha iniciado sesión, redirigirlo a process.php
 if (isset($_SESSION['usuario'])) {
-    header("Location: index.php");
+    header("Location: process.php");
     exit;
 }
 ?>
