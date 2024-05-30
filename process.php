@@ -4,55 +4,100 @@ session_start();
 
 $message = "";
 
-// Verificar si se ha enviado el formulario de inicio de sesión
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
-    // Obtener el usuario y la contraseña enviados desde el formulario
-    $usuario = $conn->real_escape_string($_POST['usuario']);
-    $password = $_POST['password'];
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['login'])) {
+        // Manejo del inicio de sesión
+        $usuario = $conn->real_escape_string($_POST['usuario']);
+        $password = $_POST['password'];
 
-    // Consultar la base de datos para obtener el usuario con el nombre proporcionado
-    $sql = "SELECT id, password FROM estudiantes WHERE usuario = '$usuario'";
-    $result = $conn->query($sql);
+        $sql = "SELECT id, password FROM estudiantes WHERE usuario = '$usuario'";
+        $result = $conn->query($sql);
 
-    if ($result->num_rows > 0) {
-        // Si se encontró un usuario, verificar la contraseña
-        $row = $result->fetch_assoc();
-        if (password_verify($password, $row['password'])) {
-            // Iniciar sesión y redirigir al usuario a process.php
-            $_SESSION['usuario'] = $usuario;
-            $_SESSION['user_id'] = $row['id'];
-            header("Location: process.php");
-            exit;
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            if (password_verify($password, $row['password'])) {
+                $_SESSION['usuario'] = $usuario;
+                $_SESSION['user_id'] = $row['id'];
+                header("Location: process.php");
+                exit;
+            } else {
+                $message = "Contraseña incorrecta.";
+            }
         } else {
-            // Si la contraseña es incorrecta, mostrar un mensaje de error
-            $message = "Contraseña incorrecta.";
+            $message = "Usuario no encontrado.";
+        }
+    } elseif (isset($_SESSION['usuario'])) {
+        if (isset($_POST['register'])) {
+            // Registro de estudiantes
+            $nombre = $conn->real_escape_string($_POST['nombre']);
+            $numero_control = $conn->real_escape_string($_POST['numero_control']);
+            $usuario = $conn->real_escape_string($_POST['usuario']);
+            $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Encriptar contraseña
+
+            $sql = "INSERT INTO estudiantes (nombre, numero_control, usuario, password) VALUES ('$nombre', '$numero_control', '$usuario', '$password')";
+
+            if ($conn->query($sql) === TRUE) {
+                $message = "Nuevo registro creado exitosamente";
+            } else {
+                $message = "Error: " . $sql . "<br>" . $conn->error;
+            }
+        } elseif (isset($_POST['search'])) {
+            // Búsqueda de estudiantes
+            $numero_control = $conn->real_escape_string($_POST['numero_control_search']);
+
+            $sql = "SELECT * FROM estudiantes WHERE numero_control = '$numero_control'";
+            $result = $conn->query($sql);
+
+            if ($result->num_rows > 0) {
+                $search_results = "";
+                while ($row = $result->fetch_assoc()) {
+                    $search_results .= "Nombre: " . $row["nombre"]. " - Número de Control: " . $row["numero_control"]. "<br>";
+                }
+            } else {
+                $search_results = "No se encontraron resultados.";
+            }
         }
     } else {
-        // Si el usuario no se encontró en la base de datos, mostrar un mensaje de error
-        $message = "Usuario no encontrado.";
+        header("Location: index.html");
+        exit;
     }
 }
 
-// Si el usuario ya ha iniciado sesión, redirigirlo a process.php
-if (isset($_SESSION['usuario'])) {
-    header("Location: process.php");
-    exit;
-}
+$conn->close();
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Formulario de Inicio de Sesión</title>
+    <title>Resultado de Procesamiento</title>
 </head>
 <body>
-    <h2>Inicio de Sesión</h2>
-    <form method="post" action="">
-        Usuario: <input type="text" name="usuario" required><br>
-        Contraseña: <input type="password" name="password" required><br>
-        <input type="submit" name="login" value="Iniciar Sesión">
-    </form>
     <?php if (!empty($message)): ?>
         <p><?php echo $message; ?></p>
+    <?php endif; ?>
+
+    <?php if (!empty($search_results)): ?>
+        <p><?php echo $search_results; ?></p>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['usuario'])): ?>
+        <h1>Hola <?php echo $usuario; ?></h1>
+        <h2>Formulario de Registro</h2>
+        <form method="post" action="process.php">
+            Nombre: <input type="text" name="nombre" required><br>
+            Número de Control: <input type="text" name="numero_control" required><br>
+            Usuario: <input type="text" name="usuario" required><br>
+            Contraseña: <input type="password" name="password" required><br>
+            <input type="submit" name="register" value="Registrar">
+        </form>
+
+        <h2>Consulta de Estudiantes</h2>
+        <form method="post" action="process.php">
+            Número de Control: <input type="text" name="numero_control_search" required><br>
+            <input type="submit" name="search" value="Buscar">
+        </form>
+    <?php else: ?>
+        <a href="index.html">Volver al inicio</a>
     <?php endif; ?>
 </body>
 </html>
