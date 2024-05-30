@@ -57,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     } else {
-        header("Location: index.php");
+        header("Location: index.html");
         exit;
     }
 }
@@ -75,11 +75,7 @@ $conn->close();
         <p><?php echo $message; ?></p>
     <?php endif; ?>
 
-    <?php if (isset($search_results)): ?>
-        <p><?php echo $search_results; ?></p>
-    <?php endif; ?>
-
-    <?php if (isset($_SESSION['usuario'])): ?>
+    <?php if (!isset($message) && isset($_SESSION['usuario'])): ?>
         <h2>Formulario de Registro</h2>
         <form method="post" action="process.php">
             Nombre: <input type="text" name="nombre" required><br>
@@ -94,8 +90,12 @@ $conn->close();
             Número de Control: <input type="text" name="numero_control_search" required><br>
             <input type="submit" name="search" value="Buscar">
         </form>
-    <?php else: ?>
-        <a href="index.php">Volver al inicio</a>
+        <!--Regresar al inicio-->
+        <form method="get" action="index.html">
+            <input type="submit" value="Ir al inicio">
+        </form>
+    <?php elseif (!isset($_SESSION['usuario'])): ?>
+        <a href="index.html">Volver al inicio</a>
     <?php endif; ?>
 </body>
 </html>
