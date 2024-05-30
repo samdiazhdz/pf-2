@@ -2,10 +2,12 @@
 include 'db.php';
 session_start();
 
+$message = "";
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['login'])) {
         // Manejo del inicio de sesión
-        $usuario = $_POST['usuario'];
+        $usuario = $conn->real_escape_string($_POST['usuario']);
         $password = $_POST['password'];
 
         $sql = "SELECT id, password FROM estudiantes WHERE usuario = '$usuario'";
@@ -27,9 +29,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (isset($_SESSION['usuario'])) {
         if (isset($_POST['register'])) {
             // Registro de estudiantes
-            $nombre = $_POST['nombre'];
-            $numero_control = $_POST['numero_control'];
-            $usuario = $_POST['usuario'];
+            $nombre = $conn->real_escape_string($_POST['nombre']);
+            $numero_control = $conn->real_escape_string($_POST['numero_control']);
+            $usuario = $conn->real_escape_string($_POST['usuario']);
             $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Encriptar contraseña
 
             $sql = "INSERT INTO estudiantes (nombre, numero_control, usuario, password) VALUES ('$nombre', '$numero_control', '$usuario', '$password')";
@@ -41,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         } elseif (isset($_POST['search'])) {
             // Búsqueda de estudiantes
-            $numero_control = $_POST['numero_control_search'];
+            $numero_control = $conn->real_escape_string($_POST['numero_control_search']);
 
             $sql = "SELECT * FROM estudiantes WHERE numero_control = '$numero_control'";
             $result = $conn->query($sql);
@@ -70,11 +72,11 @@ $conn->close();
     <title>Resultado de Procesamiento</title>
 </head>
 <body>
-    <?php if (isset($message)): ?>
+    <?php if (!empty($message)): ?>
         <p><?php echo $message; ?></p>
     <?php endif; ?>
 
-    <?php if (isset($search_results)): ?>
+    <?php if (!empty($search_results)): ?>
         <p><?php echo $search_results; ?></p>
     <?php endif; ?>
 
