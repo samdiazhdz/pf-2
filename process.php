@@ -94,6 +94,11 @@ $conn->close();
             Número de Control: <input type="text" name="numero_control_search" required><br>
             <input type="submit" name="search" value="Buscar">
         </form>
+
+        <!-- Botón para ir al inicio (login) -->
+        <form method="get" action="index.html">
+            <input type="submit" value="Ir al inicio">
+        </form>
     <?php else: ?>
         <a href="index.php">Volver al inicio</a>
     <?php endif; ?>
