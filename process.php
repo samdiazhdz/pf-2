@@ -90,7 +90,13 @@ $conn->close();
             Número de Control: <input type="text" name="numero_control_search" required><br>
             <input type="submit" name="search" value="Buscar">
         </form>
-        <!--Regresar al inicio-->
+        <!-- Mostrar resultados de la búsqueda -->
+        <?php if (isset($search_results)): ?>
+            <h3>Resultados de la Búsqueda:</h3>
+            <p><?php echo $search_results; ?></p>
+        <?php endif; ?>
+
+        <!-- Regresar al inicio -->
         <form method="get" action="index.html">
             <input type="submit" value="Ir al inicio">
         </form>
