@@ -1,6 +1,5 @@
 <?php
 include 'db.php';
-
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -95,7 +94,7 @@ $conn->close();
             <input type="submit" name="search" value="Buscar">
         </form>
     <?php else: ?>
-        <a href="index.php">Volver al inicio</a>
+        <a href="index.html">Volver al inicio</a>
     <?php endif; ?>
 </body>
 </html>
